@@ -20,9 +20,11 @@ def create_statistics(statistics_instance: StatisticsDB, statistics: StatisticsR
 
 
 @app.get("/statistics", response_model=List[StatisticsOut])
-def get_statistics(from_date: datetime.date, to_date: datetime.date, statistics: StatisticsRepository = Depends()):
-    statistics_list = statistics.all(from_date, to_date)
-    return parse_obj_as(List[StatisticsOut], statistics_list)
+def get_statistics(from_date: datetime.date, to_date: datetime.date, sort_by: str = 'id', statistics: StatisticsRepository = Depends()):
+    statistics_list = statistics.all(from_date, to_date, sort_by)
+    response = parse_obj_as(List[StatisticsOut], statistics_list)
+    response.sort(key=lambda x: x.__getattribute__(sort_by))
+    return response
 
 
 @app.post("/statistics/drop/", status_code=status.HTTP_200_OK)

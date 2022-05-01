@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from fastapi.params import Depends
+from fastapi.params import Depends, Query
 from sqlalchemy.orm import Session
 
 from ..models.statistics import Statistics
@@ -17,7 +17,7 @@ class StatisticsRepository:
         query = self.db.query(Statistics)
         return query.filter(Statistics.id == uuid).first()
 
-    def all(self, from_date, to_date) -> List[Statistics]:
+    def all(self, from_date, to_date, sort_by) -> List[Statistics]:
         query = self.db.query(Statistics)
         # return query.all()
         return query.filter(Statistics.date >= from_date, Statistics.date <= to_date).all()
@@ -26,7 +26,7 @@ class StatisticsRepository:
         db_statistics = Statistics(**statistics.dict())
         self.db.add(db_statistics)
         self.db.commit()
-        self.db.refresh(db_statistics) # TODO probably remove
+        self.db.refresh(db_statistics)  # TODO probably remove
 
         return db_statistics
 
